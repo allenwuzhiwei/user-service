@@ -1,9 +1,11 @@
 package com.nusiss.userservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -27,10 +29,14 @@ public class User{
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, updatable = false)
+    @Column
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createDatetime;
 
-    @Column(nullable = false)
+    @Column
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateDatetime;
 
     @Column(nullable = false)
@@ -43,6 +49,20 @@ public class User{
     protected void onCreate() {
         this.createDatetime = LocalDateTime.now();
         this.updateDatetime = LocalDateTime.now();
+    }
+
+    public User(){}
+
+    public User(Integer userId, String username, String email,
+                LocalDateTime createDatetime, LocalDateTime updateDatetime,
+                String createUser, String updateUser) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.createDatetime = createDatetime;
+        this.updateDatetime = updateDatetime;
+        this.createUser = createUser;
+        this.updateUser = updateUser;
     }
 
     @PreUpdate

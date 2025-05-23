@@ -6,18 +6,20 @@ import com.nusiss.userservice.config.CustomException;
 import com.nusiss.userservice.dao.AddressRepository;
 import com.nusiss.userservice.dao.PermissionRepository;
 import com.nusiss.userservice.dao.UserRepository;
-import com.nusiss.userservice.entity.Address;
 import com.nusiss.userservice.entity.Permission;
 import com.nusiss.userservice.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +43,8 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private PermissionRepository permissionRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
 
@@ -53,18 +57,61 @@ public class UserServiceImpl implements UserService{
     public Optional<User> getUserById(Integer id) {
         return userRepository.findById(id).map(user -> {
             // Encrypt the password using bcrypt
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            String encryptedPassword = passwordEncoder.encode(user.getPassword());
+            //String encryptedPassword = passwordEncoder.encode(user.getPassword());
             // Replace the user's password with the encrypted version
-            user.setPassword(encryptedPassword);
+            //user.setPassword("");
             return user;
         });
 
     }
 
     @Override
-    public Optional<User> getUserByUsername(String username) {
+    public User findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public List<User> findUsers(String username, String email, Pageable pageable) {
+        List<User> user = userRepository.searchUsers(username, email, pageable);
+
+        return user;
+    }
+
+    @Override
+    public User updateUser(User user) {
+        // Validate ID presence
+        if (user.getUserId() == null) {
+            throw new IllegalArgumentException("User ID must not be null for update.");
+        }
+
+        // Fetch existing user
+        User existing = userRepository.findById(user.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + user.getUserId()));
+
+        // Check fields and update only if not blank/null
+        if (StringUtils.isNotBlank(user.getUsername())) {
+            existing.setUsername(user.getUsername());
+        }
+
+        if (StringUtils.isNotBlank(user.getEmail())) {
+            existing.setEmail(user.getEmail());
+        }
+
+        if (StringUtils.isNotBlank(user.getPassword())) {
+            //password from frontend is not same with password in DB
+            if(!passwordEncoder.matches(existing.getPassword(), user.getPassword())){
+                existing.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+
+        }
+
+        if (StringUtils.isNotBlank(user.getUpdateUser())) {
+            existing.setUpdateUser(user.getUpdateUser());
+        }
+
+        existing.setUpdateDatetime(LocalDateTime.now());
+
+        return userRepository.save(existing);
     }
 
     @Override
@@ -116,8 +163,18 @@ public class UserServiceImpl implements UserService{
                 .anyMatch(permission -> permission.getEndpoint().equals(requestedApi) && permission.getMethod().equals(method));
     }
 
+
     @Override
     public User saveUser(User user) {
+        //only save no user
+        if (!StringUtils.isEmpty(user.getPassword())) {
+            if(user.getUserId() == null){
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+            //for update, do nothing
+        }
+        user.setCreateUser("System");
+        user.setUpdateUser("System");
         return userRepository.save(user);
     }
 

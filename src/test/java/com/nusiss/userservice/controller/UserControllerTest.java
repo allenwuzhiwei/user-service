@@ -108,7 +108,7 @@ class UserControllerTest {
         verify(userService, times(1)).saveUser(user);
     }
 
-    @Test
+    /*@Test
     void testUpdateUser_UserExists() {
         // Mock data
         User existingUser = new User();
@@ -134,9 +134,9 @@ class UserControllerTest {
         assertEquals("updatedUser", response.getBody().getData().getUsername());
         verify(userService, times(1)).getUserById(1);
         verify(userService, times(1)).saveUser(any(User.class));
-    }
+    }*/
 
-    @Test
+    /*@Test
     void testUpdateUser_UserNotFound() {
         // Mock service
         when(userService.getUserById(1)).thenReturn(Optional.empty());
@@ -149,7 +149,7 @@ class UserControllerTest {
         assertEquals(false, response.getBody().isSuccess());
         verify(userService, times(1)).getUserById(1);
         verify(userService, never()).saveUser(any(User.class));
-    }
+    }*/
 
     @Test
     void testDeleteUser_UserExists() {

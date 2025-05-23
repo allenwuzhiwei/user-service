@@ -5,6 +5,9 @@ import com.nusiss.userservice.entity.Address;
 import com.nusiss.userservice.entity.User;
 import com.nusiss.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +26,21 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
         List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Users retrieved successfully", users));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<User>>> searchUsers(@RequestParam(defaultValue = "") String username,
+                                                               @RequestParam(defaultValue = "") String email,
+                                                               @RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "10") int size,
+                                                               @RequestParam(defaultValue = "createDatetime") String sortBy,
+                                                               @RequestParam(defaultValue = "desc") String direction) {
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        List<User> users = userService.findUsers(username, email , pageable);
+
         return ResponseEntity.ok(new ApiResponse<>(true, "Users retrieved successfully", users));
     }
 
@@ -45,16 +63,17 @@ public class UserController {
 //        return ResponseEntity.status(201).body(new ApiResponse<>(true, "User and address created successfully", savedUser));
 //    }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<User>> updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
-        Optional<User> existingUser = userService.getUserById(id);
-        if (existingUser.isPresent()) {
-            updatedUser.setUserId(id);
-            User savedUser = userService.saveUser(updatedUser);
+    @PutMapping
+    public ResponseEntity<ApiResponse<User>> updateUser(@RequestBody User updatedUser) {
+        try {
+            User savedUser = userService.updateUser(updatedUser);
             return ResponseEntity.ok(new ApiResponse<>(true, "User updated successfully", savedUser));
-        } else {
-            return ResponseEntity.status(404).body(new ApiResponse<>(false, "User not found", null));
+
+        }catch(Exception e) {
+            return ResponseEntity.status(500).body(new ApiResponse<>(false, "User not found", null));
+
         }
+
     }
 
 //    @DeleteMapping("/{id}")

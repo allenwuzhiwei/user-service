@@ -1,14 +1,15 @@
 package com.nusiss.userservice.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nusiss.userservice.config.CustomException;
 import com.nusiss.userservice.entity.User;
+import com.nusiss.userservice.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -32,31 +33,33 @@ public class LoginServiceImpl implements LoginService{
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private JwtUtils jwtUtil;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Override
     public String login(String username, String password) {
-        List<User> users = userService.findUserByUsernameAndPassword(username, password);
+        User user = userService.findByUsername(username);
+        if(passwordEncoder.matches(password, user.getPassword())){
+            try {
+                String userJson = objectMapper.writeValueAsString(user);
+                //save user info to redis
+                redisCrudService.save(user.getUsername(), userJson, 30, TimeUnit.MINUTES);
+            } catch (Exception e) {
+                log.error("", e);
+                log.info(e.getMessage());
+                throw new RuntimeException(e);
+            }
+            String token = jwtUtil.generateToken(username);
+            return token;
+        } else {
 
-        //validate username
-        if(users == null || users.size() != 1){
-            throw new CustomException("Invalid username/password.");
+            throw new CustomException("Login unsuccessfully");
         }
-
-        User user = users.get(0);
-        try {
-            String userJson = objectMapper.writeValueAsString(user);
-            //save user info to redis
-            redisCrudService.save(user.getUsername(), userJson, 30, TimeUnit.MINUTES);
-        } catch (Exception e) {
-            log.error("", e);
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        //get token by username and password
-        String token = jwtTokenService.generateToken(username, password);
-
-        return token;
     }
+
+
 
     public boolean validateToken(String token){
         Claims claims =  Jwts.parserBuilder()
