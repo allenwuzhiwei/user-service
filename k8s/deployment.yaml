@@ -14,13 +14,13 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: alllenwu249/user-service:latest
+          image: allenwu1/user-service:latest
           ports:
             - containerPort: 8084
           resources:
             requests:
               cpu: "200m"
-              memory: "1Gi"
+              memory: "128Mi"
             limits:
               cpu: "500m"
-              memory: "1Gi"
+              memory: "512Mi"
