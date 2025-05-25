@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService{
     public User getCurrentUserInfo(String authToken) {
         try{
             Claims claims =  Jwts.parserBuilder()
-                    .setSigningKey(JwtTokenService.SECRET_KEY) // Set the key used to validate the signature
+                    .setSigningKey(JwtTokenService.key) // Set the key used to validate the signature
                     .build()
                     .parseClaimsJws(authToken) // Parse the token
                     .getBody(); // Get the claims from the token

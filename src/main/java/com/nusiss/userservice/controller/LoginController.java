@@ -37,11 +37,11 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/validateToken", method = RequestMethod.POST)
-    public boolean validateToken(@RequestBody Map<String, String> requestParams) {
-        String token = requestParams.get("token");
+    public ResponseEntity<ApiResponse<Boolean>> validateToken(@RequestBody Map<String, String> requestParams) {
+        String token = requestParams.get("Authorization");
         boolean isValidated = loginService.validateToken(token);
 
-        return isValidated;
+        return ResponseEntity.status(200).body(new ApiResponse<>(true, "valide successfully", isValidated));
     }
 
     @RequestMapping(value = "/getCurrentUserInfo", method = RequestMethod.POST)

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -17,17 +18,20 @@ import java.util.Map;
 @Configuration
 public class JwtTokenService {
 
+
+    public static String secret = "mySuperSecureSecretKeyThatIs32Bytes!";
+    public static SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     // Secret key for signing the JWT. Keep this secure and don't expose it.
-    public static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    //public static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static  String generateToken(String username, String password) {
+    public String generateToken(String username, String password) {
         // Get the current time
         LocalDateTime now = LocalDateTime.now();
 
         // Set expiration time to 30 minutes after the current time
-        LocalDateTime expireDateTime = now.plusMinutes(30);
+        LocalDateTime expireDateTime = now.plusMinutes(60);
 
         // Convert expiration time to Date for JWT
         Date expirationDate = java.sql.Timestamp.valueOf(expireDateTime);
@@ -45,7 +49,7 @@ public class JwtTokenService {
                 .setClaims(claims)
                 .setIssuedAt(new Date()) // Set issued time to now
                 .setExpiration(expirationDate) // Set expiration to 30 minutes later
-                .signWith(SECRET_KEY) // Sign with the secret key
+                .signWith(key) // Sign with the secret key
                 .compact();
     }
 

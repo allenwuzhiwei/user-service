@@ -62,15 +62,22 @@ public class LoginServiceImpl implements LoginService{
 
 
     public boolean validateToken(String token){
-        Claims claims =  Jwts.parserBuilder()
-                .setSigningKey(JwtTokenService.SECRET_KEY) // Set the key used to validate the signature
+        boolean validToken = false;
+
+        String trueToken = "";
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        String username = jwtUtil.extractUserName(token);
+        /*Claims claims =  Jwts.parserBuilder()
+                .setSigningKey(JwtTokenService.key) // Set the key used to validate the signature
                 .build()
                 .parseClaimsJws(token) // Parse the token
                 .getBody(); // Get the claims from the token
-
+*/
 
         // Extract information from the claims
-        String username = claims.get("username", String.class);
+        /*String username = claims.get("username", String.class);
         String password = claims.get("password", String.class);
         List<User> users = userService.findUserByUsernameAndPassword(username, password);
 
@@ -78,7 +85,12 @@ public class LoginServiceImpl implements LoginService{
             return true;
         } else {
             return false;
+        }*/
+        if(redisCrudService.exists(username)){
+            validToken = true;
         }
+
+        return validToken;
     }
 
     private String getExpiredDateTime(){
