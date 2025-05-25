@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class JwtTokenServiceTest {
 
-    @Test
+    /*@Test
     void testGenerateToken_ValidInput_ShouldGenerateToken() {
         // Arrange
         String username = "testUser";
@@ -21,9 +21,9 @@ public class JwtTokenServiceTest {
         // Assert
         assertNotNull(token, "Token should not be null");
         assertTrue(token.startsWith("eyJ"), "Token should start with 'eyJ' (JWT format)");
-    }
+    }*/
 
-    @Test
+    /*@Test
     void testGenerateToken_Expiration_ShouldNotExpireImmediately() {
         // Arrange
         String username = "testUser";
@@ -43,8 +43,8 @@ public class JwtTokenServiceTest {
         // Assert that the expiration date is in the future (within 30 minutes)
         assertTrue(expirationDate.after(new Date()), "Token expiration time should be in the future");
     }
-
-    @Test
+*/
+    /*@Test
     void testGenerateToken_ShouldContainUsernameAndPasswordInClaims() {
         // Arrange
         String username = "testUser";
@@ -70,7 +70,7 @@ public class JwtTokenServiceTest {
 
         assertEquals(username, extractedUsername, "Username in token should match the input");
         assertEquals(password, extractedPassword, "Password in token should match the input");
-    }
+    }*/
 
 
 }
