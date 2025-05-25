@@ -45,7 +45,7 @@ public class LoginServiceImpl implements LoginService{
             try {
                 String userJson = objectMapper.writeValueAsString(user);
                 //save user info to redis
-                redisCrudService.save(user.getUsername(), userJson, 30, TimeUnit.MINUTES);
+                redisCrudService.save(user.getUsername(), userJson, 60, TimeUnit.MINUTES);
             } catch (Exception e) {
                 log.error("", e);
                 log.info(e.getMessage());

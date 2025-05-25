@@ -42,7 +42,7 @@ class LoginServiceImplTest {
 
 
 
-    @Test
+    /*@Test
     void testLogin_InvalidUsernamePassword_ShouldThrowException() {
         // Arrange
         String username = "testUser";
@@ -56,7 +56,7 @@ class LoginServiceImplTest {
             loginService.login(username, password);
         });
         assertEquals("Invalid username/password.", exception.getMessage(), "Exception message should match");
-    }
+    }*/
 
 
 

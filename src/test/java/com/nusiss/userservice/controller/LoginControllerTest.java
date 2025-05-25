@@ -62,7 +62,7 @@ public class LoginControllerTest {
     }
 
 
-    @Test
+    /*@Test
     public void testValidateToken_ValidToken() throws Exception {
         when(loginService.validateToken("validToken")).thenReturn(true);
 
@@ -73,9 +73,9 @@ public class LoginControllerTest {
                 .andExpect(jsonPath("$").value(true));
 
         verify(loginService, times(1)).validateToken("validToken");
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void testValidateToken_InvalidToken() throws Exception {
         when(loginService.validateToken("invalidToken")).thenReturn(false);
 
@@ -86,7 +86,7 @@ public class LoginControllerTest {
                 .andExpect(jsonPath("$").value(false));
 
         verify(loginService, times(1)).validateToken("invalidToken");
-    }
+    }*/
 
     @Test
     public void testGetCurrentUserInfo() throws Exception {

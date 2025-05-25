@@ -41,7 +41,7 @@ public class LoginController {
         String token = requestParams.get("Authorization");
         boolean isValidated = loginService.validateToken(token);
 
-        return ResponseEntity.status(200).body(new ApiResponse<>(true, "valide successfully", isValidated));
+        return ResponseEntity.status(200).body(new ApiResponse<>(true, "Validate token", isValidated));
     }
 
     @RequestMapping(value = "/getCurrentUserInfo", method = RequestMethod.POST)
