@@ -122,6 +122,9 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getCurrentUserInfo(String authToken) {
+        if (StringUtils.isNotBlank(authToken) && authToken.startsWith("Bearer ")) {
+            authToken = authToken.substring(7);
+        }
         try{
             Claims claims =  Jwts.parserBuilder()
                     .setSigningKey(JwtTokenService.key) // Set the key used to validate the signature

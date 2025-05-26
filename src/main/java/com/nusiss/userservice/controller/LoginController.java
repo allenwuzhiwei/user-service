@@ -44,8 +44,8 @@ public class LoginController {
         return ResponseEntity.status(200).body(new ApiResponse<>(true, "Validate token", isValidated));
     }
 
-    @RequestMapping(value = "/getCurrentUserInfo", method = RequestMethod.POST)
-    public ResponseEntity<ApiResponse<User>> getCurrentUserInfo(@RequestHeader("authToken") String authToken) {
+    @RequestMapping(value = "/getCurrentUserInfo", method = RequestMethod.GET)
+    public ResponseEntity<ApiResponse<User>> getCurrentUserInfo(@RequestHeader("Authorization") String authToken) {
 
         User user =  userService.getCurrentUserInfo(authToken);
         return ResponseEntity.status(200).body(new ApiResponse<>(true, "Retrieve successfully", user));
