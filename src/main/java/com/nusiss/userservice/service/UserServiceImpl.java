@@ -126,15 +126,13 @@ public class UserServiceImpl implements UserService{
             authToken = authToken.substring(7);
         }
         try{
-            Claims claims =  Jwts.parserBuilder()
-                    .setSigningKey(JwtTokenService.key) // Set the key used to validate the signature
+            String username = Jwts.parserBuilder()
+                    .setSigningKey(JwtTokenService.key)
                     .build()
-                    .parseClaimsJws(authToken) // Parse the token
-                    .getBody(); // Get the claims from the token
+                    .parseClaimsJws(authToken)
+                    .getBody()
+                    .getSubject();
 
-
-            // Extract information from the claims
-            String username = claims.get("username", String.class);
             if(redisCrudService.exists(username)){
                 String userJson = redisCrudService.get(username);
                 return objectMapper.readValue(userJson, User.class);
