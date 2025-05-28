@@ -1,18 +1,27 @@
 package com.nusiss.userservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nusiss.userservice.config.CustomException;
+import com.nusiss.userservice.dao.UserRepository;
 import com.nusiss.userservice.entity.User;
+import com.nusiss.userservice.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +42,13 @@ class LoginServiceImplTest {
     private RedisCrudService redisCrudService;
 
     @Mock
+    private JwtUtils jwtUtil;
+
+    @Mock
     private ObjectMapper objectMapper;
+
+    @Mock
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -42,22 +57,90 @@ class LoginServiceImplTest {
 
 
 
-    /*@Test
+    @Test
     void testLogin_InvalidUsernamePassword_ShouldThrowException() {
         // Arrange
         String username = "testUser";
         String password = "wrongPassword";
-        List<User> users = Arrays.asList(); // No user found
-
-        when(userService.findUserByUsernameAndPassword(username, password)).thenReturn(users);
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword("test");
+        when(userService.findByUsername(username)).thenReturn(user);
 
         // Act & Assert
         CustomException exception = assertThrows(CustomException.class, () -> {
             loginService.login(username, password);
         });
-        assertEquals("Invalid username/password.", exception.getMessage(), "Exception message should match");
-    }*/
+        assertEquals("Login unsuccessfully", exception.getMessage(), "Exception message should match");
+    }
 
+    @Test
+    void testLogin_CorrectUsernamePassword() {
+        // Arrange
+        String username = "admin";
+        String password = "password1";
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword("$2a$10$RgOBjYIZ3wHfFvZYq3NdKe/Fr8EIRUoizWJM1DM0j00bBHzulakpa");
+        when(userService.findByUsername(username)).thenReturn(user);
+
+        when(jwtUtil.generateToken(username)).thenReturn("token");
+        String token = loginService.login(username, password);
+        assertEquals("token", token);
+    }
+
+    @Test
+    void testLogin_CorrectUsernamePassword_ShouldThrowException() throws JsonProcessingException {
+        // Arrange
+        String username = "admin";
+        String password = "password1";
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword("$2a$10$RgOBjYIZ3wHfFvZYq3NdKe/Fr8EIRUoizWJM1DM0j00bBHzulakpa");
+        when(userService.findByUsername(username)).thenReturn(user);
+
+        when(jwtUtil.generateToken(username)).thenReturn("token");
+
+
+        // This is a checked exception, so your test method must declare `throws Exception`
+        /*doThrow(new RuntimeException("Redis error"))
+                .when(redisCrudService)
+                .save(anyString(), anyString(), anyLong(), any(TimeUnit.class));*/
+        when(objectMapper.writeValueAsString(user))
+                .thenThrow(new JsonProcessingException("Serialization failed") {});
+        try{
+            loginService.login(username, password);
+        }catch (Exception e){
+            assertTrue(e.getMessage().contains("Serialization failed"));
+
+        }
+    }
+
+    @Test
+    void testValidateToken_TokenExistsInRedis_ShouldReturnTrue() {
+        String token = "Bearer valid.token.value";
+        String username = "admin";
+
+        when(jwtUtil.extractUserName("valid.token.value")).thenReturn(username);
+        when(redisCrudService.exists(username)).thenReturn(true);
+
+        boolean isValid = loginService.validateToken(token);
+
+        assertTrue(isValid, "Token should be valid when present in Redis");
+    }
+
+    @Test
+    void testValidateToken_TokenDoesNotExistInRedis_ShouldReturnFalse() {
+        String token = "Bearer some.token.value";
+        String username = "user";
+
+        when(jwtUtil.extractUserName("some.token.value")).thenReturn(username);
+        when(redisCrudService.exists(username)).thenReturn(false);
+
+        boolean isValid = loginService.validateToken(token);
+
+        assertFalse(isValid, "Token should be invalid when not present in Redis");
+    }
 
 
 

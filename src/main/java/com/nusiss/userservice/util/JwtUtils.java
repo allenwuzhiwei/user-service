@@ -19,8 +19,8 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    private final String secret = "mySuperSecureSecretKeyThatIs32Bytes!";
-    private final SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    public static final String secret = "mySuperSecureSecretKeyThatIs32Bytes!";
+    public static final SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
     @Autowired
     private RedisCrudService redisCrudService;

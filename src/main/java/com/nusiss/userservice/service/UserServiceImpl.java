@@ -8,6 +8,7 @@ import com.nusiss.userservice.dao.PermissionRepository;
 import com.nusiss.userservice.dao.UserRepository;
 import com.nusiss.userservice.entity.Permission;
 import com.nusiss.userservice.entity.User;
+import com.nusiss.userservice.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
@@ -127,7 +128,7 @@ public class UserServiceImpl implements UserService{
         }
         try{
             String username = Jwts.parserBuilder()
-                    .setSigningKey(JwtTokenService.key)
+                    .setSigningKey(JwtUtils.key)
                     .build()
                     .parseClaimsJws(authToken)
                     .getBody()

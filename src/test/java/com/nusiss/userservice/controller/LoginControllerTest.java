@@ -10,15 +10,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.net.URI;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 //@SpringBootTest
 @AutoConfigureMockMvc
@@ -105,4 +110,51 @@ public class LoginControllerTest {
 
         verify(userService, times(1)).getCurrentUserInfo("validAuthToken");
     }*/
+
+    @Test
+    public void testValidateToken_ValidToken() throws Exception {
+        when(loginService.validateToken("validToken")).thenReturn(true);
+
+        mockMvc.perform(post("/validateToken")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"Authorization\":\"validToken\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Validate token"))
+                .andExpect(jsonPath("$.data").value(true));
+
+        verify(loginService, times(1)).validateToken("validToken");
+    }
+
+    @Test
+    public void testValidateToken_InvalidToken() throws Exception {
+        when(loginService.validateToken("invalidToken")).thenReturn(false);
+
+        mockMvc.perform(post("/validateToken")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"Authorization\":\"invalidToken\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Validate token"))
+                .andExpect(jsonPath("$.data").value(false));
+
+        verify(loginService, times(1)).validateToken("invalidToken");
+    }
+
+    @Test
+    public void testGetCurrentUserInfo() throws Exception {
+        User user = new User();
+        user.setUsername("testUser");
+
+        when(userService.getCurrentUserInfo("validAuthToken")).thenReturn(user);
+        URI uri = URI.create("/getCurrentUserInfo");
+        mockMvc.perform(get(uri)
+                        .header("Authorization", "validAuthToken"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Retrieve successfully"))
+                .andExpect(jsonPath("$.data.username").value("testUser"));
+
+        verify(userService, times(1)).getCurrentUserInfo("validAuthToken");
+    }
 }

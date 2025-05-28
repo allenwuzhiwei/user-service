@@ -185,4 +185,37 @@ class UserControllerTest {
         verify(userService, times(1)).getUserById(1);
         verify(userService, never()).deleteUser(1);
     }
+
+    @Test
+    void testSearchUsers() {
+        // Mock data
+        User user1 = new User();
+        user1.setUserId(1);
+        user1.setUsername("john_doe");
+        user1.setEmail("john@example.com");
+
+        User user2 = new User();
+        user2.setUserId(2);
+        user2.setUsername("john_smith");
+        user2.setEmail("smith@example.com");
+
+        List<User> mockUsers = Arrays.asList(user1, user2);
+
+        // Mock service response
+        when(userService.findUsers(eq("john"), eq(""), any())).thenReturn(mockUsers);
+
+        // Call controller method
+        ResponseEntity<ApiResponse<List<User>>> response = userController.searchUsers(
+                "john", "", 0, 10, "createDatetime", "desc");
+
+        // Verify
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(2, response.getBody().getData().size());
+        assertEquals("john_doe", response.getBody().getData().get(0).getUsername());
+        assertEquals(true, response.getBody().isSuccess());
+
+        verify(userService, times(1)).findUsers(eq("john"), eq(""), any());
+    }
+
+
 }

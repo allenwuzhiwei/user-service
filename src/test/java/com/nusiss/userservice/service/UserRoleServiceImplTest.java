@@ -75,4 +75,25 @@ class UserRoleServiceImplTest {
         verify(roleRepository, times(0)).findById(anyLong());
     }
 
+    @Test
+    void testCreateRoleForUser_ShouldSaveUserRole() {
+        // Arrange
+        Long userId = 2L;
+        Long roleId = 202L;
+
+        // Act
+        userRoleService.createRoleForUser(roleId, userId);
+
+        // Assert
+        ArgumentCaptor<UserRole> captor = ArgumentCaptor.forClass(UserRole.class);
+        verify(userRoleRepository, times(1)).save(captor.capture());
+
+        UserRole savedUserRole = captor.getValue();
+        assertNotNull(savedUserRole);
+        assertNotNull(savedUserRole.getId());
+        assertEquals(userId, savedUserRole.getId().getUserId());
+        assertEquals(roleId, savedUserRole.getId().getRoleId());
+    }
+
+
 }

@@ -19,7 +19,7 @@ import java.util.Map;
 public class JwtTokenService {
 
 
-    public static String secret = "mySuperSecureSecretKeyThatIs32Bytes!";
+    /*public static String secret = "mySuperSecureSecretKeyThatIs32Bytes!";
     public static SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     // Secret key for signing the JWT. Keep this secure and don't expose it.
     //public static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
@@ -51,7 +51,7 @@ public class JwtTokenService {
                 .setExpiration(expirationDate) // Set expiration to 30 minutes later
                 .signWith(key) // Sign with the secret key
                 .compact();
-    }
+    }*/
 
     // Set the JWT token in the cookie and add it to the response
     /*public void addTokenToCookie(HttpServletResponse response, String token) {
