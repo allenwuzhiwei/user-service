@@ -175,8 +175,6 @@ public class UserServiceImpl implements UserService{
             }
             //for update, do nothing
         }
-        user.setCreateUser("System");
-        user.setUpdateUser("System");
         return userRepository.save(user);
     }
 
