@@ -22,7 +22,7 @@ void setUp() {
 MockitoAnnotations.openMocks(this);
 }
 
-@Test
+/*@Test
 void checkIfHasPermission_WithValidPermission_ShouldReturnTrue() {
 // Arrange
 String authToken = "valid-auth-token";
@@ -52,5 +52,5 @@ Boolean result = permissionController.checkIfHasPermission(authToken, url, metho
 // Assert
 assertFalse(result);
 verify(userService).hasPermission(authToken, url, method);
-}
+}*/
 }

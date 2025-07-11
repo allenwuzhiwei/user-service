@@ -94,7 +94,7 @@ public class AddressControllerTest {
         address1.setStreet("123 Main St");
 
         Address address2 = new Address();
-        address2.setId(2L);
+        address2.setId(2);
         address2.setStreet("456 Main St");
 
         when(addressService.getAddressesByUserId(1)).thenReturn(Arrays.asList(address1, address2));
@@ -102,7 +102,7 @@ public class AddressControllerTest {
         mockMvc.perform(get("/api/addresses/user/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[1].id").value(2L));
+                .andExpect(jsonPath("$[1].id").value(2));
 
         verify(addressService, times(1)).getAddressesByUserId(1);
     }
