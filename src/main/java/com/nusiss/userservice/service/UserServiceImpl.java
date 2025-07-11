@@ -3,13 +3,10 @@ package com.nusiss.userservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nusiss.userservice.config.CustomException;
-import com.nusiss.userservice.dao.AddressRepository;
-import com.nusiss.userservice.dao.PermissionRepository;
-import com.nusiss.userservice.dao.UserRepository;
-import com.nusiss.userservice.entity.Permission;
-import com.nusiss.userservice.entity.User;
+import com.nusiss.userservice.dao.*;
+import com.nusiss.userservice.dto.UserWithRolesDTO;
+import com.nusiss.userservice.entity.*;
 import com.nusiss.userservice.util.JwtUtils;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +41,12 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private UserRoleRepository userRoleRepository;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
@@ -72,10 +75,22 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<User> findUsers(String username, String email, Pageable pageable) {
-        List<User> user = userRepository.searchUsers(username, email, pageable);
+    public List<UserWithRolesProjection> findUsers(String username, String email, Pageable pageable) {
+        List<UserWithRolesProjection> user = userRepository.searchUsersWithRoles(username, email, pageable);
 
         return user;
+    }
+
+    public UserRole assignRole(Integer userId, Integer roleId) {
+        //User user = userRepository.findById(userId)
+        //        .orElseThrow(() -> new RuntimeException("User not found"));
+        //Role role = roleRepository.findById(roleId)
+        //        .orElseThrow(() -> new RuntimeException("Role not found"));
+        UserRole userRole = new UserRole();
+        userRole.setUserId(userId);
+        userRole.setRoleId(roleId);
+
+        return userRoleRepository.save(userRole);
     }
 
     @Override

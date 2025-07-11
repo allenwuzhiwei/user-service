@@ -26,11 +26,11 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean
+    /*@Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule()); // Register the Java Time module
 
         return objectMapper;
-    }
+    }*/
 }

@@ -16,12 +16,12 @@ public class AddressServiceImpl implements AddressService{
     private AddressRepository addressRepository;
 
     // 根据 addressId 查询 Address
-    public Optional<Address> getAddressById(Long addressId) {
+    public Optional<Address> getAddressById(Integer addressId) {
         return addressRepository.findById(addressId);
     }
 
     // 根据 userId 查询 Address 列表
-    public List<Address> getAddressesByUserId(Long userId) {
+    public List<Address> getAddressesByUserId(Integer userId) {
         return addressRepository.findByUserId(userId);
     }
 
@@ -32,7 +32,7 @@ public class AddressServiceImpl implements AddressService{
 
     // 更新 Address
     @Transactional
-    public Address updateAddress(Long addressId, Address newAddressData) {
+    public Address updateAddress(Integer addressId, Address newAddressData) {
         return addressRepository.findById(addressId)
                 .map(address -> {
                     address.setStreet(newAddressData.getStreet());
@@ -46,7 +46,7 @@ public class AddressServiceImpl implements AddressService{
     }
 
     // 根据 addressId 删除 Address
-    public void deleteAddress(Long addressId) {
+    public void deleteAddress(Integer addressId) {
         if (addressRepository.existsById(addressId)) {
             addressRepository.deleteById(addressId);
         } else {

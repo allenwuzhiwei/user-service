@@ -1,17 +1,22 @@
 package com.nusiss.userservice.entity;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "user_roles", schema = "nusmall_user")
-public class UserRole {
-    @EmbeddedId
-    private UserRoleId id;
+@Table(name = "user_roles")
+public class UserRole extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
+
+    @Column(name = "role_id", nullable = false)
+    private Integer roleId;
 
 }

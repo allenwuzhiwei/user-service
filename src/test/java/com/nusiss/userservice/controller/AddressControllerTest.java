@@ -42,11 +42,11 @@ public class AddressControllerTest {
     @Test
     public void testCreateAddress() throws Exception {
         Address address = new Address();
-        address.setId(1L);
+        address.setId(1);
         address.setStreet("123 Main St");
         address.setCity("City");
         address.setState("State");
-        address.setUserId(1L);
+        address.setUserId(1);
         address.setCreateUser("user1");
 
         when(addressService.createAddress(any(Address.class))).thenReturn(address);
@@ -55,7 +55,7 @@ public class AddressControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"userId\":1,\"street\":\"123 Main St\",\"city\":\"City\",\"state\":\"State\",\"createUser\":\"user1\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.street").value("123 Main St"));
 
         verify(addressService, times(1)).createAddress(any(Address.class));
@@ -64,84 +64,84 @@ public class AddressControllerTest {
     @Test
     public void testGetAddressById() throws Exception {
         Address address = new Address();
-        address.setId(1L);
+        address.setId(1);
         address.setStreet("123 Main St");
 
-        when(addressService.getAddressById(1L)).thenReturn(Optional.of(address));
+        when(addressService.getAddressById(1)).thenReturn(Optional.of(address));
 
         mockMvc.perform(get("/api/addresses/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.street").value("123 Main St"));
 
-        verify(addressService, times(1)).getAddressById(1L);
+        verify(addressService, times(1)).getAddressById(1);
     }
 
     @Test
     public void testGetAddressById_NotFound() throws Exception {
-        when(addressService.getAddressById(1L)).thenReturn(Optional.empty());
+        when(addressService.getAddressById(1)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/addresses/1"))
                 .andExpect(status().isNotFound());
 
-        verify(addressService, times(1)).getAddressById(1L);
+        verify(addressService, times(1)).getAddressById(1);
     }
 
     @Test
     public void testGetAddressesByUserId() throws Exception {
         Address address1 = new Address();
-        address1.setId(1L);
+        address1.setId(1);
         address1.setStreet("123 Main St");
 
         Address address2 = new Address();
         address2.setId(2L);
         address2.setStreet("456 Main St");
 
-        when(addressService.getAddressesByUserId(1L)).thenReturn(Arrays.asList(address1, address2));
+        when(addressService.getAddressesByUserId(1)).thenReturn(Arrays.asList(address1, address2));
 
         mockMvc.perform(get("/api/addresses/user/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[1].id").value(2L));
 
-        verify(addressService, times(1)).getAddressesByUserId(1L);
+        verify(addressService, times(1)).getAddressesByUserId(1);
     }
 
     @Test
     public void testGetAddressesByUserId_NotFound() throws Exception {
-        when(addressService.getAddressesByUserId(1L)).thenReturn(Arrays.asList());
+        when(addressService.getAddressesByUserId(1)).thenReturn(Arrays.asList());
 
         mockMvc.perform(get("/api/addresses/user/1"))
                 .andExpect(status().isNotFound());
 
-        verify(addressService, times(1)).getAddressesByUserId(1L);
+        verify(addressService, times(1)).getAddressesByUserId(1);
     }
 
     @Test
     public void testUpdateAddress() throws Exception {
         Address updatedAddress = new Address();
-        updatedAddress.setId(1L);
+        updatedAddress.setId(1);
         updatedAddress.setStreet("123 Main St Updated");
 
-        when(addressService.updateAddress(eq(1L), any(Address.class))).thenReturn(updatedAddress);
+        when(addressService.updateAddress(eq(1), any(Address.class))).thenReturn(updatedAddress);
 
         mockMvc.perform(put("/api/addresses/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"street\":\"123 Main St Updated\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.street").value("123 Main St Updated"));
 
-        verify(addressService, times(1)).updateAddress(eq(1L), any(Address.class));
+        verify(addressService, times(1)).updateAddress(eq(1), any(Address.class));
     }
 
     @Test
     public void testDeleteAddress() throws Exception {
-        doNothing().when(addressService).deleteAddress(1L);
+        doNothing().when(addressService).deleteAddress(1);
 
         mockMvc.perform(delete("/api/addresses/1"))
                 .andExpect(status().isNoContent());
 
-        verify(addressService, times(1)).deleteAddress(1L);
+        verify(addressService, times(1)).deleteAddress(1);
     }
 }

@@ -9,16 +9,16 @@ import java.time.LocalDateTime;
 @Table(name = "role_permissions")
 @Setter
 @Getter
-public class RolePermission {
+public class RolePermission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "role_id", nullable = false)
-    private Long roleId;
+    private Integer roleId;
 
     @Column(name = "permission_id", nullable = false)
-    private Long permissionId;
+    private Integer permissionId;
 
 }

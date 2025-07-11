@@ -1,6 +1,9 @@
 package com.nusiss.userservice.service;
 
+import com.nusiss.userservice.dto.UserWithRolesDTO;
 import com.nusiss.userservice.entity.User;
+import com.nusiss.userservice.entity.UserRole;
+import com.nusiss.userservice.entity.UserWithRolesProjection;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -26,8 +29,10 @@ public interface UserService {
 
     User findByUsername(String username);
 
-    public List<User> findUsers(String username, String email, Pageable pageable);
+    public List<UserWithRolesProjection> findUsers(String username, String email, Pageable pageable);
 
     public User updateUser(User user);
+
+    public UserRole assignRole(Integer userId, Integer roleId);
 
 }

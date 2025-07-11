@@ -17,11 +17,11 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id", nullable = false)
-    private Long id;
+    private Integer id;
 
     @NotNull
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private Integer userId;
 
     @Size(max = 255)
     @NotNull

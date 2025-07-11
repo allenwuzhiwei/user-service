@@ -28,7 +28,7 @@ public class AddressController {
 
     @GetMapping("/{id}")
     @Operation(summary = "get address by id")
-    public ResponseEntity<Address> getAddressById(@PathVariable("id") Long addressId) {
+    public ResponseEntity<Address> getAddressById(@PathVariable("id") Integer addressId) {
         Optional<Address> address = addressService.getAddressById(addressId);
         return address.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -37,7 +37,7 @@ public class AddressController {
 
     @GetMapping("/user/{userId}")
     @Operation(summary = "get addresses by user id")
-    public ResponseEntity<List<Address>> getAddressesByUserId(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<Address>> getAddressesByUserId(@PathVariable("userId") Integer userId) {
         List<Address> addresses = addressService.getAddressesByUserId(userId);
         // 如果地址列表为空，返回 404
         if (addresses.isEmpty()) {
@@ -48,7 +48,7 @@ public class AddressController {
 
     @PutMapping("/{id}")
     @Operation(summary = "update address")
-    public ResponseEntity<Address> updateAddress(@PathVariable("id") Long addressId,
+    public ResponseEntity<Address> updateAddress(@PathVariable("id") Integer addressId,
                                                  @RequestBody Address address) {
         Address updatedAddress = addressService.updateAddress(addressId, address);
         return new ResponseEntity<>(updatedAddress, HttpStatus.OK);
@@ -56,7 +56,7 @@ public class AddressController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "delete address")
-    public ResponseEntity<Void> deleteAddress(@PathVariable("id") Long addressId) {
+    public ResponseEntity<Void> deleteAddress(@PathVariable("id") Integer addressId) {
         addressService.deleteAddress(addressId);
         return ResponseEntity.noContent().build();
     }

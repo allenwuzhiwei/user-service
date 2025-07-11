@@ -1,8 +1,10 @@
 package com.nusiss.userservice.controller;
 
 import com.nusiss.userservice.config.ApiResponse;
+import com.nusiss.userservice.dto.UserWithRolesDTO;
 import com.nusiss.userservice.entity.Address;
 import com.nusiss.userservice.entity.User;
+import com.nusiss.userservice.entity.UserWithRolesProjection;
 import com.nusiss.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<User>>> searchUsers(@RequestParam(defaultValue = "") String username,
+    public ResponseEntity<ApiResponse<List<UserWithRolesProjection>>> searchUsers(@RequestParam(defaultValue = "") String username,
                                                                @RequestParam(defaultValue = "") String email,
                                                                @RequestParam(defaultValue = "0") int page,
                                                                @RequestParam(defaultValue = "10") int size,
@@ -39,7 +41,7 @@ public class UserController {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        List<User> users = userService.findUsers(username, email , pageable);
+        List<UserWithRolesProjection> users = userService.findUsers(username, email , pageable);
 
         return ResponseEntity.ok(new ApiResponse<>(true, "Users retrieved successfully", users));
     }

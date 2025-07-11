@@ -10,30 +10,19 @@ import java.time.LocalDateTime;
 @Table(name = "permissions")
 @Setter
 @Getter
-public class Permission {
+public class Permission  extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String endpoint;
 
     @Column(nullable = false)
     private String method; // e.g., GET, POST, PUT, DELETE
 
-    @Column(name = "create_user")
-    private String createUser;
+    @Column(nullable = true)
+    private String description;
 
-    @Column(name = "create_datetime")
-    private LocalDateTime createDatetime;
-
-    @Column(name = "update_user")
-    private String updateUser;
-
-    @Column(name = "update_datetime")
-    private LocalDateTime updateDatetime;
-
-    // Getters and Setters
-    // Constructors
 }
