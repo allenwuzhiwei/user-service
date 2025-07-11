@@ -36,33 +36,33 @@ class AddressServiceImplTest {
     @Test
     void testGetAddressById_Success() {
         Address mockAddress = new Address();
-        mockAddress.setId(1L);
+        mockAddress.setId(1);
         mockAddress.setStreet("123 Main St");
-        when(addressRepository.findById(1L)).thenReturn(Optional.of(mockAddress));
+        when(addressRepository.findById(1)).thenReturn(Optional.of(mockAddress));
 
-        Optional<Address> result = addressService.getAddressById(1L);
+        Optional<Address> result = addressService.getAddressById(1);
 
         assertTrue(result.isPresent());
         assertEquals("123 Main St", result.get().getStreet());
-        verify(addressRepository, times(1)).findById(1L);
+        verify(addressRepository, times(1)).findById(1);
     }
 
     @Test
     void testGetAddressesByUserId_Success() {
         Address address1 = new Address();
-        address1.setId(1L);
+        address1.setId(1);
         address1.setStreet("123 Main St");
 
         Address address2 = new Address();
-        address2.setId(2L);
+        address2.setId(2);
         address2.setStreet("456 Elm St");
 
-        when(addressRepository.findByUserId(1L)).thenReturn(Arrays.asList(address1, address2));
+        when(addressRepository.findByUserId(1)).thenReturn(Arrays.asList(address1, address2));
 
-        List<Address> result = addressService.getAddressesByUserId(1L);
+        List<Address> result = addressService.getAddressesByUserId(1);
 
         assertEquals(2, result.size());
-        verify(addressRepository, times(1)).findByUserId(1L);
+        verify(addressRepository, times(1)).findByUserId(1);
     }
 
     @Test
@@ -80,38 +80,38 @@ class AddressServiceImplTest {
 
     @Test
     void testUpdateAddress_NotFound() {
-        when(addressRepository.findById(1L)).thenReturn(Optional.empty());
+        when(addressRepository.findById(1)).thenReturn(Optional.empty());
 
         Address updatedData = new Address();
         updatedData.setStreet("New St");
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                addressService.updateAddress(1L, updatedData));
+                addressService.updateAddress(1, updatedData));
 
         assertEquals("Address with ID 1 not found", exception.getMessage());
-        verify(addressRepository, times(1)).findById(1L);
+        verify(addressRepository, times(1)).findById(1);
         verify(addressRepository, times(0)).save(any(Address.class));
     }
 
     @Test
     void testDeleteAddress_Success() {
-        when(addressRepository.existsById(1L)).thenReturn(true);
+        when(addressRepository.existsById(1)).thenReturn(true);
 
-        addressService.deleteAddress(1L);
+        addressService.deleteAddress(1);
 
-        verify(addressRepository, times(1)).existsById(1L);
-        verify(addressRepository, times(1)).deleteById(1L);
+        verify(addressRepository, times(1)).existsById(1);
+        verify(addressRepository, times(1)).deleteById(1);
     }
 
     @Test
     void testDeleteAddress_NotFound() {
-        when(addressRepository.existsById(1L)).thenReturn(false);
+        when(addressRepository.existsById(1)).thenReturn(false);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                addressService.deleteAddress(1L));
+                addressService.deleteAddress(1));
 
         assertEquals("Address with ID 1 not found", exception.getMessage());
-        verify(addressRepository, times(1)).existsById(1L);
-        verify(addressRepository, times(0)).deleteById(anyLong());
+        verify(addressRepository, times(1)).existsById(1);
+        verify(addressRepository, times(0)).deleteById(anyInt());
     }
 }
