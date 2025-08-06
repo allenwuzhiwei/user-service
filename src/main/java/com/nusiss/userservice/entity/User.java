@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Table(name = "User")
 @Setter
 @Getter
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User{
 
     @Id

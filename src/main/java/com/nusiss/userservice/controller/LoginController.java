@@ -52,4 +52,12 @@ public class LoginController {
 
     }
 
+    @RequestMapping(value = "/getCurrentUserInfoWithTokenString", method = RequestMethod.GET)
+    public ResponseEntity<ApiResponse<User>> getCurrentUserInfoWithTokenString(@RequestParam("authToken") String authToken) {
+
+        User user =  userService.getCurrentUserInfo(authToken);
+        return ResponseEntity.status(200).body(new ApiResponse<>(true, "Retrieve successfully", user));
+
+    }
+
 }

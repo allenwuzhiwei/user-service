@@ -4,10 +4,6 @@ import com.nusiss.userservice.config.ApiResponse;
 import com.nusiss.userservice.entity.Role;
 import com.nusiss.userservice.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +37,12 @@ public class RoleController {
     public ResponseEntity<ApiResponse<Role>> createRole(@RequestBody Role dto) {
         Role created = roleService.create(dto);
         return ResponseEntity.ok(new ApiResponse<>(true, "Role created successfully", created));
+    }
+
+    @GetMapping("/userId/{userId}")
+    public ResponseEntity<ApiResponse<Integer>> getRoleByUserId(@PathVariable Integer userId){
+        Integer roleId = roleService.getRoleByUserId(userId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Role got successfully", roleId));
     }
 
     @PutMapping("/{id}")

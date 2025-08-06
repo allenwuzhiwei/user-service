@@ -9,10 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PermissionService {
@@ -42,6 +39,7 @@ public class PermissionService {
             dto.setId(p.getId());
             dto.setEndpoint(p.getEndpoint());
             dto.setMethod(p.getMethod());
+            dto.setDescription(p.getDescription());
             dto.setCreateUser(p.getCreateUser());
             dto.setCreateDatetime(p.getCreateDatetime());
             dto.setUpdateUser(p.getUpdateUser());
@@ -55,6 +53,11 @@ public class PermissionService {
         });
     }
 
+    public Set<String> findPermissionsByUserId(Integer userId){
+        Set<String> permissions = permissionRepository.findPermissionsByUserId(userId);
+
+        return permissions;
+    }
     private PermissionDTO toDTO(Permission p) {
         PermissionDTO dto = new PermissionDTO();
         dto.setId(p.getId());

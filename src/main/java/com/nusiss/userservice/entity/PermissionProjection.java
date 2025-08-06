@@ -6,6 +6,7 @@ public interface PermissionProjection {
     Integer getId();
     String getEndpoint();
     String getMethod();
+    String getDescription();
     String getCreateUser();
     LocalDateTime getCreateDatetime();
     String getUpdateUser();

@@ -43,9 +43,15 @@ public class UserRoleService {
 
 
     public UserRole create(UserRole ur) {
+        //delete old relationship first,one user can only have on record
+        userRoleRepository.deleteByUserId(ur.getUserId());
         return userRoleRepository.save(ur);
     }
     public Optional<UserRole> get(Integer id) { return userRoleRepository.findById(id); }
     public List<UserRole> list() { return userRoleRepository.findAll(); }
     public void delete(Integer id) { userRoleRepository.deleteById(id); }
+
+    public void deleteByUserId(Integer userId){
+        userRoleRepository.deleteByUserId(userId);
+    }
 }

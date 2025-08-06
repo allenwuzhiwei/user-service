@@ -69,4 +69,9 @@ public class UserRoleController {
         return ResponseEntity.ok(new ApiResponse<>(true, "UserRole deleted successfully", null));
     }
 
+    /*@DeleteMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<Void>> deleteByUserId(@PathVariable Integer userId) {
+        userRoleService.deleteByUserId(userId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "UserRole deleted successfully", null));
+    }*/
 }

@@ -22,6 +22,11 @@ public class RoleService {
     @Autowired
     UserService userService;
 
+    public Integer getRoleByUserId(Integer userId){
+
+        return roleRepository.getRoleByUserId(userId);
+    }
+
     public Role create(Role r) {
         return roleRepository.save(r);
     }

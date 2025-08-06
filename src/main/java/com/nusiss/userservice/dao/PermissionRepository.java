@@ -17,6 +17,10 @@ public interface PermissionRepository extends JpaRepository<Permission, Integer>
             "            JOIN user_roles ur ON ur.role_id= rp.role_id WHERE ur.user_id = ?1", nativeQuery = true)
     Set<Permission> findPermissionsByUserRoles(Integer userId);
 
+    @Query(value = "SELECT p.endpoint FROM permissions p JOIN role_permissions rp ON rp.permission_id = p.id " +
+            "            JOIN user_roles ur ON ur.role_id= rp.role_id WHERE ur.user_id = ?1", nativeQuery = true)
+    Set<String> findPermissionsByUserId(Integer userId);
+
     Page<Permission> findByEndpointContainingIgnoreCase(String endpoint, Pageable pageable);
 
     @Query(
@@ -25,6 +29,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Integer>
           p.id AS id,
           p.endpoint AS endpoint,
           p.method AS method,
+          p.description AS description,
           p.create_user AS createUser,
           p.create_datetime AS createDatetime,
           p.update_user AS updateUser,

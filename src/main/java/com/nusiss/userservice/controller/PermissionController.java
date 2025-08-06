@@ -7,6 +7,7 @@ import com.nusiss.userservice.entity.Permission;
 import com.nusiss.userservice.entity.UserRole;
 import com.nusiss.userservice.service.PermissionService;
 import com.nusiss.userservice.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
@@ -108,7 +109,13 @@ public class PermissionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/paged/getallAPIs")
+    @GetMapping("/findPermissionsByUserId")
+    public ResponseEntity<Set<String>> findPermissionsByUserId(@RequestParam("userId") Integer userId){
+
+        return ResponseEntity.ok(permissionService.findPermissionsByUserId(userId));
+    }
+
+    @PostMapping("/paged/endpoints")
     public ResponseEntity<Map<String, Object>> listAllApiEndpoints(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -134,10 +141,14 @@ public class PermissionController {
                 } else {
                     for (RequestMethod method : methods) {
                         allEndpoints.add(method.name() + ":" + path);
-                        Permission p = new Permission();
-                        p.setEndpoint(path);
-                        p.setMethod(method.name());
-                        permissionRepository.save(p);
+                        if(StringUtils.isNotBlank(path) && !path.contains("/v3")){
+                            String desc = generateDescription(method.name(), path);
+                            Permission p = new Permission();
+                            p.setEndpoint("/users"+path);
+                            p.setMethod(method.name());
+                            p.setDescription(desc);
+                            permissionRepository.save(p);
+                        }
                     }
                 }
             }
@@ -160,6 +171,40 @@ public class PermissionController {
         response.put("page", page);
 
         return ResponseEntity.ok(Collections.singletonMap("data", response));
+    }
+
+    public String generateDescription(String method, String endpoint) {
+        // Step 1: Extract resource
+        String resource = endpoint.replaceFirst("^/api/", "");
+        resource = resource.replaceAll("\\{[^}]+\\}", ""); // remove {id}, etc.
+        resource = resource.replaceAll("//+", "/"); // clean double slashes
+        resource = resource.replaceAll("^/|/$", ""); // remove leading/trailing slash
+        String[] parts = resource.split("/");
+
+        String resourceName = parts.length > 0 ? parts[0] : "resource";
+        resourceName = resourceName.replace("-", " "); // optional formatting
+
+        // Step 2: Map HTTP method to action
+        String action;
+        switch (method.toUpperCase()) {
+            case "GET":
+                action = endpoint.contains("{") ? "Get" : "Get list of";
+                break;
+            case "POST":
+                action = "Save";
+                break;
+            case "PUT":
+                action = "Update";
+                break;
+            case "DELETE":
+                action = "Delete";
+                break;
+            default:
+                action = "Call";
+        }
+
+        // Step 3: Assemble
+        return action + " " + resourceName;
     }
 
 }

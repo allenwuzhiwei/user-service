@@ -53,6 +53,13 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.status(404).body(new ApiResponse<>(false, "User not found", null)));
     }
 
+    @GetMapping("/{name}")
+    public ResponseEntity<ApiResponse<User>> findByUsername(@PathVariable String name) {
+        User user = userService.findByUsername(name);
+
+        return ResponseEntity.ok(new ApiResponse<>(true, "User retrieved successfully", user));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<User>> createUser(@RequestBody User user) {
         User savedUser = userService.saveUser(user);
