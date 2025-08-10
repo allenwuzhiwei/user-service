@@ -34,7 +34,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Integer>
           p.create_datetime AS createDatetime,
           p.update_user AS updateUser,
           p.update_datetime AS updateDatetime,
-          GROUP_CONCAT(r.name) AS roles
+          GROUP_CONCAT(DISTINCT r.name) AS roles
         FROM 
           permissions p
         LEFT JOIN 
