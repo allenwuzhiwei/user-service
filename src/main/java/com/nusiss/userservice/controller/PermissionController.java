@@ -4,10 +4,8 @@ import com.nusiss.userservice.config.ApiResponse;
 import com.nusiss.userservice.dao.PermissionRepository;
 import com.nusiss.userservice.dto.PermissionDTO;
 import com.nusiss.userservice.entity.Permission;
-import com.nusiss.userservice.entity.UserRole;
 import com.nusiss.userservice.service.PermissionService;
 import com.nusiss.userservice.service.UserService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
@@ -16,26 +14,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.web.util.pattern.PathPattern;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.Set;
 
 //@CrossOrigin(origins = "http://localhost:5000")
 @RestController
 @RequestMapping("/api/permissions")
 public class PermissionController {
 
-    private final RequestMappingHandlerMapping handlerMapping;
+    /*private final RequestMappingHandlerMapping handlerMapping;
 
     @Autowired
     public PermissionController(ApplicationContext context) {
         this.handlerMapping = context.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
-    }
+    }*/
 
     @Autowired
     UserService userService;
@@ -115,7 +109,7 @@ public class PermissionController {
         return ResponseEntity.ok(permissionService.findPermissionsByUserId(userId));
     }
 
-    @PostMapping("/paged/endpoints")
+    /*@PostMapping("/paged/endpoints")
     public ResponseEntity<Map<String, Object>> listAllApiEndpoints(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -206,5 +200,5 @@ public class PermissionController {
         // Step 3: Assemble
         return action + " " + resourceName;
     }
-
+*/
 }
