@@ -1,8 +1,6 @@
 package com.nusiss.userservice.controller;
 
 import com.nusiss.userservice.config.ApiResponse;
-import com.nusiss.userservice.dto.UserWithRolesDTO;
-import com.nusiss.userservice.entity.Address;
 import com.nusiss.userservice.entity.User;
 import com.nusiss.userservice.entity.UserWithRolesProjection;
 import com.nusiss.userservice.service.UserService;
@@ -13,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

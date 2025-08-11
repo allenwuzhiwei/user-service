@@ -93,7 +93,7 @@ public class LoginServiceImpl implements LoginService{
         return validToken;
     }
 
-    private String getExpiredDateTime(){
+    String getExpiredDateTime(){
         // Get the current date and time
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 30); // Add 30 minutes

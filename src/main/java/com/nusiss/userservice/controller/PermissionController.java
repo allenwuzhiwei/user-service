@@ -38,7 +38,7 @@ public class PermissionController {
     }
 
     @Autowired
-    private UserService userService;
+    UserService userService;
 
     @RequestMapping(value = "/permission", method = RequestMethod.GET)
     public Boolean checkIfHasPermission(@RequestHeader("authToken") String authToken,

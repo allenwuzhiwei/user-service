@@ -5,11 +5,16 @@ import com.nusiss.userservice.config.CustomException;
 import com.nusiss.userservice.dao.AddressRepository;
 import com.nusiss.userservice.dao.PermissionRepository;
 import com.nusiss.userservice.dao.UserRepository;
+import com.nusiss.userservice.dao.UserRoleRepository;
 import com.nusiss.userservice.dto.UserWithRolesDTO;
+import com.nusiss.userservice.entity.Permission;
 import com.nusiss.userservice.entity.User;
+import com.nusiss.userservice.entity.UserRole;
+import com.nusiss.userservice.entity.UserWithRolesProjection;
 import com.nusiss.userservice.util.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -18,9 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -32,6 +35,9 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserRoleRepository userRoleRepository;
 
     @Mock
     private AddressRepository addressRepository;
@@ -327,6 +333,114 @@ class UserServiceImplTest {
         assertEquals("System", savedUser.getUpdateUser());
 
         verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void testHasPermission_userNull_returnsFalse() {
+        // Mock getCurrentUserInfo to return null
+        UserService spyService = spy(userService);
+        doReturn(null).when(spyService).getCurrentUserInfo(anyString());
+
+        boolean result = spyService.hasPermission("someToken", "/api/test", "GET");
+
+        assertFalse(result);
+        verify(spyService).getCurrentUserInfo("someToken");
+        verifyNoInteractions(permissionRepository);
+    }
+
+    @Test
+    void testHasPermission_userHasMatchingPermission_returnsTrue() {
+        User user = new User();
+        user.setUserId(1);
+
+        Permission p1 = new Permission();
+        p1.setEndpoint("/api/test");
+        p1.setMethod("GET");
+
+        Permission p2 = new Permission();
+        p2.setEndpoint("/api/other");
+        p2.setMethod("POST");
+
+        Set<Permission> permissions = new HashSet<>(Arrays.asList(p1, p2));
+
+        UserService spyService = spy(userService);
+        doReturn(user).when(spyService).getCurrentUserInfo(anyString());
+        when(permissionRepository.findPermissionsByUserRoles(user.getUserId())).thenReturn(permissions);
+
+        boolean result = spyService.hasPermission("validToken", "/api/test", "GET");
+
+        assertTrue(result);
+        verify(spyService).getCurrentUserInfo("validToken");
+        verify(permissionRepository).findPermissionsByUserRoles(1);
+    }
+
+    @Test
+    void testHasPermission_userHasNoMatchingPermission_returnsFalse() {
+        User user = new User();
+        user.setUserId(2);
+
+        Permission p1 = new Permission();
+        p1.setEndpoint("/api/other");
+        p1.setMethod("POST");
+
+        Set<Permission> permissions = new HashSet<>(Collections.singletonList(p1));
+
+        UserService spyService = spy(userService);
+        doReturn(user).when(spyService).getCurrentUserInfo(anyString());
+        when(permissionRepository.findPermissionsByUserRoles(user.getUserId())).thenReturn(permissions);
+
+        boolean result = spyService.hasPermission("validToken", "/api/test", "GET");
+
+        assertFalse(result);
+        verify(spyService).getCurrentUserInfo("validToken");
+        verify(permissionRepository).findPermissionsByUserRoles(2);
+    }
+
+    @Test
+    void testFindUsers_returnsUserList() {
+        Pageable pageable = mock(Pageable.class);
+        String username = "john";
+        String email = "john@example.com";
+
+        List<UserWithRolesProjection> mockUsers = List.of(mock(UserWithRolesProjection.class), mock(UserWithRolesProjection.class));
+        when(userRepository.searchUsersWithRoles(username, email, pageable)).thenReturn(mockUsers);
+
+        List<UserWithRolesProjection> result = userService.findUsers(username, email, pageable);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        verify(userRepository).searchUsersWithRoles(username, email, pageable);
+    }
+
+    @Test
+    void testAssignRole_savesAndReturnsUserRole() {
+        Integer userId = 1;
+        Integer roleId = 2;
+
+        UserRole toSave = new UserRole();
+        toSave.setUserId(userId);
+        toSave.setRoleId(roleId);
+
+        UserRole savedUserRole = new UserRole();
+        savedUserRole.setUserId(userId);
+        savedUserRole.setRoleId(roleId);
+        savedUserRole.setId(100);  // Suppose it gets an ID after save
+
+        when(userRoleRepository.save(any(UserRole.class))).thenReturn(savedUserRole);
+
+        UserRole result = userService.assignRole(userId, roleId);
+
+        assertNotNull(result);
+        assertEquals(userId, result.getUserId());
+        assertEquals(roleId, result.getRoleId());
+        assertEquals(100, result.getId());
+
+        ArgumentCaptor<UserRole> captor = ArgumentCaptor.forClass(UserRole.class);
+        verify(userRoleRepository).save(captor.capture());
+
+        UserRole captured = captor.getValue();
+        assertEquals(userId, captured.getUserId());
+        assertEquals(roleId, captured.getRoleId());
     }
 
 }

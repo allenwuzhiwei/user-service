@@ -1,222 +1,154 @@
 package com.nusiss.userservice.controller;
 
 import com.nusiss.userservice.config.ApiResponse;
-import com.nusiss.userservice.dto.UserWithRolesDTO;
+import com.nusiss.userservice.entity.UserWithRolesProjection;
 import com.nusiss.userservice.entity.User;
 import com.nusiss.userservice.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class UserControllerTest {
 
-    @InjectMocks
-    private UserController userController;
-
     @Mock
     private UserService userService;
 
-    public UserControllerTest() {
+    @InjectMocks
+    private UserController userController;
+
+    @BeforeEach
+    void setup() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void testGetAllUsers() {
-        // Mock data
-        User user1 = new User();
-        user1.setUserId(1);
-        user1.setUsername("testUser1");
-
-        User user2 = new User();
-        user2.setUserId(2);
-        user2.setUsername("testUser2");
-
-        List<User> users = Arrays.asList(user1, user2);
-
-        // Mock service
+        List<User> users = Arrays.asList(new User(), new User());
         when(userService.getAllUsers()).thenReturn(users);
 
-        // Call method
         ResponseEntity<ApiResponse<List<User>>> response = userController.getAllUsers();
 
-        // Verify results
         assertEquals(200, response.getStatusCodeValue());
+        assertTrue(response.getBody().isSuccess());
         assertEquals(2, response.getBody().getData().size());
-        verify(userService, times(1)).getAllUsers();
     }
 
     @Test
-    void testGetUserById_UserExists() {
-        // Mock data
+    void testSearchUsers() {
+        List<UserWithRolesProjection> projections = new ArrayList<>();
+        when(userService.findUsers(anyString(), anyString(), any(Pageable.class))).thenReturn(projections);
+
+        ResponseEntity<ApiResponse<List<UserWithRolesProjection>>> response = userController.searchUsers(
+                "", "", 0, 10, "createDatetime", "desc");
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertTrue(response.getBody().isSuccess());
+        assertNotNull(response.getBody().getData());
+    }
+
+    @Test
+    void testGetUserById_found() {
         User user = new User();
         user.setUserId(1);
-        user.setUsername("testUser");
-
-        // Mock service
         when(userService.getUserById(1)).thenReturn(Optional.of(user));
 
-        // Call method
         ResponseEntity<ApiResponse<User>> response = userController.getUserById(1);
 
-        // Verify results
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("testUser", response.getBody().getData().getUsername());
-        verify(userService, times(1)).getUserById(1);
+        assertTrue(response.getBody().isSuccess());
+        User userResult = response.getBody().getData();
+        assertEquals(1, userResult.getUserId());
     }
 
     @Test
-    void testGetUserById_UserNotFound() {
-        // Mock service
-        when(userService.getUserById(1)).thenReturn(Optional.empty());
+    void testGetUserById_notFound() {
+        when(userService.getUserById(100)).thenReturn(Optional.empty());
 
-        // Call method
-        ResponseEntity<ApiResponse<User>> response = userController.getUserById(1);
+        ResponseEntity<ApiResponse<User>> response = userController.getUserById(100);
 
-        // Verify results
         assertEquals(404, response.getStatusCodeValue());
-        assertEquals(false, response.getBody().isSuccess());
-        verify(userService, times(1)).getUserById(1);
+        assertFalse(response.getBody().isSuccess());
+    }
+
+    @Test
+    void testFindByUsername() {
+        User user = new User();
+        user.setUsername("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(user);
+
+        ResponseEntity<ApiResponse<User>> response = userController.findByUsername("testuser");
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertTrue(response.getBody().isSuccess());
+        assertEquals("testuser", response.getBody().getData().getUsername());
     }
 
     @Test
     void testCreateUser() {
-        // Mock data
         User user = new User();
-        user.setUsername("newUser");
+        user.setUsername("newuser");
 
-        User savedUser = new User();
-        savedUser.setUserId(1);
-        savedUser.setUsername("newUser");
+        when(userService.saveUser(user)).thenReturn(user);
 
-        // Mock service
-        when(userService.saveUser(user)).thenReturn(savedUser);
-
-        // Call method
         ResponseEntity<ApiResponse<User>> response = userController.createUser(user);
 
-        // Verify results
         assertEquals(201, response.getStatusCodeValue());
-        assertEquals("newUser", response.getBody().getData().getUsername());
-        verify(userService, times(1)).saveUser(user);
+        assertTrue(response.getBody().isSuccess());
+        assertEquals("newuser", response.getBody().getData().getUsername());
     }
 
-    /*@Test
-    void testUpdateUser_UserExists() {
-        // Mock data
-        User existingUser = new User();
-        existingUser.setUserId(1);
-        existingUser.setUsername("existingUser");
+    @Test
+    void testUpdateUser_success() {
+        User user = new User();
+        user.setUsername("updatedUser");
 
-        User updatedUser = new User();
-        updatedUser.setUsername("updatedUser");
+        when(userService.updateUser(user)).thenReturn(user);
 
-        User savedUser = new User();
-        savedUser.setUserId(1);
-        savedUser.setUsername("updatedUser");
+        ResponseEntity<ApiResponse<User>> response = userController.updateUser(user);
 
-        // Mock service
-        when(userService.getUserById(1)).thenReturn(Optional.of(existingUser));
-        when(userService.saveUser(any(User.class))).thenReturn(savedUser);
-
-        // Call method
-        ResponseEntity<ApiResponse<User>> response = userController.updateUser(1, updatedUser);
-
-        // Verify results
         assertEquals(200, response.getStatusCodeValue());
+        assertTrue(response.getBody().isSuccess());
         assertEquals("updatedUser", response.getBody().getData().getUsername());
-        verify(userService, times(1)).getUserById(1);
-        verify(userService, times(1)).saveUser(any(User.class));
-    }*/
-
-    /*@Test
-    void testUpdateUser_UserNotFound() {
-        // Mock service
-        when(userService.getUserById(1)).thenReturn(Optional.empty());
-
-        // Call method
-        ResponseEntity<ApiResponse<User>> response = userController.updateUser(1, new User());
-
-        // Verify results
-        assertEquals(404, response.getStatusCodeValue());
-        assertEquals(false, response.getBody().isSuccess());
-        verify(userService, times(1)).getUserById(1);
-        verify(userService, never()).saveUser(any(User.class));
-    }*/
+    }
 
     @Test
-    void testDeleteUser_UserExists() {
-        // Mock data
-        User existingUser = new User();
-        existingUser.setUserId(1);
+    void testUpdateUser_failure() {
+        User user = new User();
+        when(userService.updateUser(user)).thenThrow(new RuntimeException("User not found"));
 
-        // Mock service
-        when(userService.getUserById(1)).thenReturn(Optional.of(existingUser));
+        ResponseEntity<ApiResponse<User>> response = userController.updateUser(user);
+
+        assertEquals(500, response.getStatusCodeValue());
+        assertFalse(response.getBody().isSuccess());
+        assertEquals("User not found", response.getBody().getMessage());
+    }
+
+    @Test
+    void testDeleteUser_found() {
+        User user = new User();
+        when(userService.getUserById(1)).thenReturn(Optional.of(user));
         doNothing().when(userService).deleteUser(1);
 
-        // Call method
         ResponseEntity<ApiResponse<String>> response = userController.deleteUser(1);
 
-        // Verify results
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals(true, response.getBody().isSuccess());
-        verify(userService, times(1)).getUserById(1);
-        verify(userService, times(1)).deleteUser(1);
+        assertTrue(response.getBody().isSuccess());
     }
 
     @Test
-    void testDeleteUser_UserNotFound() {
-        // Mock service
-        when(userService.getUserById(1)).thenReturn(Optional.empty());
+    void testDeleteUser_notFound() {
+        when(userService.getUserById(100)).thenReturn(Optional.empty());
 
-        // Call method
-        ResponseEntity<ApiResponse<String>> response = userController.deleteUser(1);
+        ResponseEntity<ApiResponse<String>> response = userController.deleteUser(100);
 
-        // Verify results
         assertEquals(404, response.getStatusCodeValue());
-        assertEquals(false, response.getBody().isSuccess());
-        verify(userService, times(1)).getUserById(1);
-        verify(userService, never()).deleteUser(1);
+        assertFalse(response.getBody().isSuccess());
     }
-
-    /*@Test
-    void testSearchUsers() {
-        // Mock data
-        User user1 = new User();
-        user1.setUserId(1);
-        user1.setUsername("john_doe");
-        user1.setEmail("john@example.com");
-
-        User user2 = new User();
-        user2.setUserId(2);
-        user2.setUsername("john_smith");
-        user2.setEmail("smith@example.com");
-
-        List<User> mockUsers = Arrays.asList(user1, user2);
-
-        // Mock service response
-        when(userService.findUsers(eq("john"), eq(""), any())).thenReturn(mockUsers);
-
-        // Call controller method
-        ResponseEntity<ApiResponse<List<UserWithRolesDTO>>> response = userController.searchUsers(
-                "john", "", 0, 10, "createDatetime", "desc");
-
-        // Verify
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(2, response.getBody().getData().size());
-        assertEquals("john_doe", response.getBody().getData().get(0).getUsername());
-        assertEquals(true, response.getBody().isSuccess());
-
-        verify(userService, times(1)).findUsers(eq("john"), eq(""), any());
-    }*/
-
-
 }

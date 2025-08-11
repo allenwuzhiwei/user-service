@@ -18,10 +18,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -140,6 +140,27 @@ class LoginServiceImplTest {
         boolean isValid = loginService.validateToken(token);
 
         assertFalse(isValid, "Token should be invalid when not present in Redis");
+    }
+
+    @Test
+    void testGetExpiredDateTime() throws ParseException {
+        LoginServiceImpl instance = new LoginServiceImpl();
+
+        String expiredDateTimeStr = instance.getExpiredDateTime();
+
+        // Parse the returned string back to a Date
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date expiredDate = sdf.parse(expiredDateTimeStr);
+
+        // Get current time plus 30 minutes
+        Calendar expectedCalendar = Calendar.getInstance();
+        expectedCalendar.add(Calendar.MINUTE, 30);
+        Date expectedDate = expectedCalendar.getTime();
+
+        // Allow some delta (e.g., 2 seconds) because time passes during test
+        long diffMillis = Math.abs(expiredDate.getTime() - expectedDate.getTime());
+
+        assertTrue(diffMillis < 2000, "Expired date should be approximately 30 minutes from now");
     }
 
 

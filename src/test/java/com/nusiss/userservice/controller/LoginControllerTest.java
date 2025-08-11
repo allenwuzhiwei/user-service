@@ -1,5 +1,6 @@
 package com.nusiss.userservice.controller;
 
+import com.nusiss.userservice.config.ApiResponse;
 import com.nusiss.userservice.entity.User;
 import com.nusiss.userservice.service.JwtTokenService;
 import com.nusiss.userservice.service.LoginService;
@@ -11,8 +12,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -93,7 +97,7 @@ public class LoginControllerTest {
         verify(loginService, times(1)).validateToken("invalidToken");
     }*/
 
-    /*@Test
+    /*\@Test
     public void testGetCurrentUserInfo() throws Exception {
         User user = new User();
         user.setUsername("testUser");
@@ -156,5 +160,25 @@ public class LoginControllerTest {
                 .andExpect(jsonPath("$.data.username").value("testUser"));
 
         verify(userService, times(1)).getCurrentUserInfo("validAuthToken");
+    }
+
+    @Test
+    void testGetCurrentUserInfoWithTokenString_ReturnsUser() {
+        String authToken = "valid-token";
+        User mockUser = new User();
+        mockUser.setUserId(1);
+        mockUser.setUsername("john.doe");
+
+        when(userService.getCurrentUserInfo(authToken)).thenReturn(mockUser);
+
+        ResponseEntity<ApiResponse<User>> response = loginController.getCurrentUserInfoWithTokenString(authToken);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().isSuccess());
+        assertEquals("Retrieve successfully", response.getBody().getMessage());
+        assertEquals(mockUser, response.getBody().getData());
+
+        verify(userService, times(1)).getCurrentUserInfo(authToken);
     }
 }
