@@ -28,18 +28,7 @@ public class RolePermissionController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<List<RolePermission>>> createPermission(@RequestBody List<RolePermission> dtos) {
-        List<RolePermission> results = new ArrayList<>();
-        if(dtos != null){
-            for (RolePermission rolePermission : dtos){
-                //check if it exists
-                Optional<RolePermission> pr = rolePermissionService.findByRoleIdAndPermissionId(rolePermission.getRoleId(), rolePermission.getPermissionId());
-                if(pr.isPresent()){
-                    RolePermission created = rolePermissionService.create(rolePermission);
-                    results.add(created);
-                }
-
-            }
-        }
+        List<RolePermission> results = rolePermissionService.createPermission(dtos);
 
         return ResponseEntity.ok(new ApiResponse<>(true, "Permission created successfully", results));
     }
