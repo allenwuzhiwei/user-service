@@ -4,6 +4,7 @@ import com.nusiss.userservice.config.ApiResponse;
 import com.nusiss.userservice.entity.RolePermission;
 import com.nusiss.userservice.service.RolePermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +31,13 @@ public class RolePermissionController {
         List<RolePermission> results = new ArrayList<>();
         if(dtos != null){
             for (RolePermission rolePermission : dtos){
-                RolePermission created = rolePermissionService.create(rolePermission);
-                results.add(created);
+                //check if it exists
+                Optional<RolePermission> pr = rolePermissionService.findByRoleIdAndPermissionId(rolePermission.getRoleId(), rolePermission.getPermissionId());
+                if(pr.isPresent()){
+                    RolePermission created = rolePermissionService.create(rolePermission);
+                    results.add(created);
+                }
+
             }
         }
 
@@ -39,6 +45,11 @@ public class RolePermissionController {
     }
 
 
+    /**
+     * delete by permission id
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deletePermission(@PathVariable Integer id) {
         rolePermissionService.delete(id);

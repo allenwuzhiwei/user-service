@@ -18,7 +18,11 @@ public class RolePermissionService {
         return repo.save(rp);
     }
 
+    public Optional<RolePermission> findByRoleIdAndPermissionId(Integer roleId, Integer permissionId){
+
+        return repo.findByRoleIdAndPermissionId(roleId, permissionId);
+    }
     public Optional<RolePermission> get(Integer id) { return repo.findById(id); }
     public List<RolePermission> list() { return repo.findAll(); }
-    public void delete(Integer id) { repo.deleteById(id); }
+    public void delete(Integer id) { repo.deleteByPermissionId(id); }
 }
