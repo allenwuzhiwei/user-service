@@ -22,13 +22,13 @@ public class UserRoleService {
     @Autowired
     private UserService userService;
 
-    public Optional<Role> getRoleByUserId(Integer userId) {
+    /*public Optional<Role> getRoleByUserId(Integer userId) {
         Optional<UserRole> userRole = userRoleRepository.findByUserId(userId);
         if (userRole.isPresent()) {
             return roleRepository.findById(userId);
         }
         return Optional.empty();
-    }
+    }*/
 
     public void createRoleForUser(Integer roleId, Integer userId) {
         // 创建 UserRoleId 作为复合主键
