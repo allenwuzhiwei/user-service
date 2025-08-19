@@ -19,6 +19,6 @@ spec:
             - containerPort: 8084
           resources:
             requests:
-              memory: "300Mi"
+              memory: "200Mi"
             limits:
               memory: "512Mi"
