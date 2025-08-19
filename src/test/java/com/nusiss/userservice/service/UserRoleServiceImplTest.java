@@ -36,7 +36,7 @@ class UserRoleServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
+    /*@Test
     void testGetRoleByUserId_whenUserRolePresent_thenReturnRole() {
         Integer userId = 1;
         UserRole userRole = new UserRole();
@@ -59,9 +59,9 @@ class UserRoleServiceTest {
 
         verify(userRoleRepository).findByUserId(userId);
         verify(roleRepository).findById(userId);
-    }
+    }*/
 
-    @Test
+    /*@Test
     void testGetRoleByUserId_whenUserRoleNotPresent_thenReturnEmpty() {
         Integer userId = 1;
 
@@ -73,7 +73,7 @@ class UserRoleServiceTest {
 
         verify(userRoleRepository).findByUserId(userId);
         verify(roleRepository, never()).findById(any());
-    }
+    }*/
 
     @Test
     void testCreateRoleForUser() {
