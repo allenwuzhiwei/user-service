@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: user-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: user-service
@@ -19,6 +19,6 @@ spec:
             - containerPort: 8084
           resources:
             requests:
-              memory: "128Mi"
+              memory: "300Mi"
             limits:
               memory: "512Mi"
