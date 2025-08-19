@@ -93,8 +93,8 @@ public class PermissionController {
         Sort sort = direction.equalsIgnoreCase("desc") ?
                 Sort.by(sortBy).descending() :
                 Sort.by(sortBy).ascending();
-
-        Pageable pageable = PageRequest.of(page, size, sort);
+        //page number is from 0.
+        Pageable pageable = PageRequest.of(page-1, size, sort);
         Page<PermissionDTO> permissions = permissionService.getAllPermissionsDTO(endpoint, pageable);
 
         ApiResponse<Page<PermissionDTO>> response =
